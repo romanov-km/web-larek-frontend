@@ -4,6 +4,7 @@
 .modal {
   @include mixins.sublayer;
   height: max-content;
+  height: 90vh; //
   position: absolute;
   display: none;
   justify-content: center;
@@ -22,6 +23,8 @@
     gap: $defaultPadding;
     background-color: $background;
     min-height: 90vmin;
+    max-width: 1200px;
+    max-height: 610px;
     border-radius: 3rem;
     box-sizing: border-box;
     position: relative;
