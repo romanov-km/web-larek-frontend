@@ -2,7 +2,7 @@ import { Api } from './base/api';
 import { IOrder, IOrderResult, IProductItem, IWebLarekAPI, ApiListResponse } from "../types";
 
 
-export class LarekAPI extends Api implements IWebLarekAPI {
+export class WebLarekAPI extends Api implements IWebLarekAPI {
     readonly cdn: string;
 
     constructor(cdn: string, baseUrl: string, options?: RequestInit) {

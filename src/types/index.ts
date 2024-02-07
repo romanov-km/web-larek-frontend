@@ -30,6 +30,7 @@ export interface IProductItem {
 
 export interface ICard extends IProductItem {
 	index?: number;
+    titleButton?: string;
 }
 
 export interface ICardActions {
@@ -69,11 +70,6 @@ export interface IWebLarekAPI {
 export interface IOrderResult {
     id: string;
     total: number;
-}
-
-export interface IFormState {
-    valid: boolean;
-    errors: string[];
 }
 
 export interface IPage {

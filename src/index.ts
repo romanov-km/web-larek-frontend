@@ -1,6 +1,6 @@
 import './scss/styles.scss';
 
-import { LarekAPI } from "./components/WebLarekApi";
+import { WebLarekAPI } from "./components/WebLarekApi";
 import { API_URL, CDN_URL } from "./utils/constants";
 import { EventEmitter } from "./components/base/events";
 import { AppState, CatalogChangeEvent, ProductItem } from "./components/AppData";
@@ -14,7 +14,7 @@ import { OrderModal, ContactModal } from "./components/Order";
 import { Success } from "./components/common/Success";
 
 const events = new EventEmitter();
-const api = new LarekAPI(CDN_URL, API_URL);
+const api = new WebLarekAPI(CDN_URL, API_URL);
 
 // Чтобы мониторить все события, для отладки
 events.onAll(({ eventName, data }) => {
@@ -42,7 +42,7 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 
 const contact = new ContactModal(cloneTemplate(contactTemplate), events);
-const order = new OrderModal(cloneTemplate(orderTemplate), events);
+const order = new OrderModal(cloneTemplate(orderTemplate), events, { onClick: (event: Event) => events.emit('payment:change', event.target) });
 
 // Дальше идет бизнес-логика
 // Поймали событие, сделали что нужно
@@ -132,15 +132,16 @@ events.on('order:submit', () => {
 });
 
 const categoryPayment: {[key: string]: string} = {
-    "online": "online",
+    "card": "card",
     "cash": "cash",
 }
 
-events.on('payment:toggle', (target: HTMLElement) => {
-    if(!target.classList.contains('button_alt-active')) {
-        appData.order.payment = categoryPayment[target.getAttribute('name')];    
-    } 
-});
+events.on('payment:change', (target: HTMLElement) => {
+    if (!target.classList.contains('button_alt-active')) {
+        order.toggleClassButton(target);
+        appData.order.payment = categoryPayment[target.getAttribute('name')];
+    }
+})
 
 // Открыть корзину
 events.on('basket:open', () => {
@@ -155,8 +156,16 @@ events.on('card:select', (item: ProductItem) => {
 });
 
 // Добавление товара в корзину
-events.on('product:add', (item: ProductItem) => {
+events.on('product:chooseaction', (item: ProductItem) => {
     modal.close();
+    if(appData.basket.indexOf(item) < 0) {
+        events.emit('product:add', item);
+    } else {
+        events.emit('product:delete', item);
+    }
+});
+
+events.on('product:add', (item: ProductItem) => {
     appData.addProductItemToBasket(item);
 });
 
@@ -191,10 +200,11 @@ events.on('counter:changed', () => {
 
 // Изменен открытый выбранный товар
 events.on('preview:changed', (item: ProductItem) => {
-    const showItem = (item: ProductItem) => {
+
         const card = new Card(cloneTemplate(cardPreviewTemplate), {
             onClick: () => {
-                events.emit('product:add', item)
+                events.emit('product:chooseaction', item);
+                card.titleButton = (appData.basket.indexOf(item) < 0) ? 'Купить' : 'Удалить из корзины';
             }
         });
 
@@ -205,25 +215,11 @@ events.on('preview:changed', (item: ProductItem) => {
                 description: item.description,
                 category: item.category,
                 price: item.price,
-                id: item.id
+                id: item.id,
+                titleButton: (appData.basket.indexOf(item) < 0 ? 'Купить' : 'Удалить из корзины'),
                 })
         });
 
-    };
-
-    if (item) {
-        api.getProductItem(item.id)
-            .then((result) => {
-                item.description = result.description;
-                
-                showItem(item);
-            })
-            .catch((err) => {
-                console.error(err);
-            })
-    } else {
-        modal.close();
-    }
 });
 
 

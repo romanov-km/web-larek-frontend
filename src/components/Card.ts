@@ -17,7 +17,8 @@ export class Card extends Component<ICard> {
     protected _button?: HTMLButtonElement;
     protected _price: HTMLElement;
     protected _category?: HTMLElement;
-    protected _index?: HTMLElement; 
+    protected _index?: HTMLElement;
+    protected _tittleButton: string;
 
     constructor(container: HTMLElement, actions?: ICardActions) {
         super(container);
@@ -29,6 +30,7 @@ export class Card extends Component<ICard> {
         this._description = container.querySelector(`.card__text`);
         this._category = container.querySelector(`.card__category`);
         this._index = container.querySelector(`.basket__item-index`);
+        
 
         if (actions?.onClick) {
             if (this._button) {
@@ -60,7 +62,8 @@ export class Card extends Component<ICard> {
     }
 
     set price(value: number | null) {
-        this.setText(this._price, (value) ? value.toString() : '');
+        this.setText(this._price, (value) ? `${value.toString()} синапсов` : 'бесценно');
+        this.turnOffButton(value);
     }
 
     get price(): number {
@@ -86,6 +89,20 @@ export class Card extends Component<ICard> {
 
     get index(): string {
         return this._index.textContent || '';
+    }
+
+    set titleButton(value: string) {
+        if (this._button) {
+            this._button.textContent = value;
+        }
+    }
+
+    turnOffButton(value: number | string) {
+        if(!value) {
+            if(this._button) {
+                this._button.disabled = true;
+            }
+        }
     }
 }
 
