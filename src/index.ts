@@ -191,6 +191,7 @@ events.on('basket:changed', (items: ProductItem[]) => {
     const total = items.reduce((total, item) => total + item.price, 0)
     basket.total = total;
     appData.order.total = total;
+    basket.disableBuyButton(total === 0);
 });
 
 //Счетчик товаров на корзинке

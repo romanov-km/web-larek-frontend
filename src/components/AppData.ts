@@ -37,9 +37,7 @@ export class AppState extends Model<IAppState> {
     }
 
     deleteProductItemFromBasket(item: ProductItem) {
-        console.log('Before removal:', this.basket);
         this.basket = this.basket.filter((i) => i.id !== item.id);
-        console.log('After removal:', this.basket);
         this.updateBasket();
     }
 
