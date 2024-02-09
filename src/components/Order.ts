@@ -38,7 +38,7 @@ export class OrderModal extends Form<IOrderModal> {
         (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
     }
 
-    toggleClassButton(target: HTMLElement) {
+    toggleClassButton() {
         this._online.classList.toggle('button_alt-active');
         this._cash.classList.toggle('button_alt-active');
     }
